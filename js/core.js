@@ -5,7 +5,7 @@ const $=(s,r)=>(r||document).querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem('tg_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('tg_'+k,JSON.stringify(v))}catch(e){}}};
 
 // Orden del feed (los ids que no estén aquí se añaden al final en orden de carga)
-const ORDER=['stack','lava','orbit','egg','gravity','disco','worm','sushi','cloud','pinball','bridge','western','chameleon','ghost','candy','mole','pizza','tightrope','road','frogs','numbers','ice','lander','bakery','zoo','bubbles'];
+const ORDER=['stack','lava','merge','orbit','egg','traffic','gravity','disco','gates','worm','sushi','shell','cloud','pinball','primes','bridge','western','ink','chameleon','ghost','hilo','candy','mole','binary','pizza','tightrope','sum10','road','frogs','count','numbers','ice','lander','bakery','zoo','bubbles'];
 const BY={};GAMES.forEach(g=>BY[g.id]=g);
 const LIST=ORDER.map(i=>BY[i]).filter(Boolean).concat(GAMES.filter(g=>ORDER.indexOf(g.id)<0));
 
