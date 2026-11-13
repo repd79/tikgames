@@ -4,13 +4,30 @@
 const $=(s,r)=>(r||document).querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem('tg_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('tg_'+k,JSON.stringify(v))}catch(e){}}};
 
-// Orden del feed (los ids que no estén aquí se añaden al final en orden de carga)
-const ORDER=['stack','lava','merge','orbit','egg','traffic','gravity','disco','gates','worm','sushi','shell','cloud','pinball','primes','bridge','western','ink','chameleon','ghost','hilo','candy','mole','binary','pizza','tightrope','sum10','road','frogs','count','numbers','ice','lander','bakery','zoo','bubbles'];
-const BY={};GAMES.forEach(g=>BY[g.id]=g);
-const LIST=ORDER.map(i=>BY[i]).filter(Boolean).concat(GAMES.filter(g=>ORDER.indexOf(g.id)<0));
+// Familias visuales de los juegos originales (los nuevos traen su propio `style`)
+const OLDSTYLE={stack:'synthwave',disco:'synthwave',lava:'comic',orbit:'space',ice:'space',egg:'kawaii',cloud:'kawaii',candy:'kawaii',bakery:'kawaii',gravity:'factory',sushi:'ukiyo',bridge:'medieval',western:'medieval',hilo:'medieval',chameleon:'jungle',mole:'cartoon',pizza:'cartoon',tightrope:'cartoon',zoo:'cartoon',bubbles:'cartoon',traffic:'cartoon',road:'pixel',numbers:'chalk',lander:'terminal',primes:'terminal',merge:'paper',binary:'paper',ink:'paper',sum10:'blueprint'};
+const BY={};GAMES.forEach(g=>{g.style=g.style||OLDSTYLE[g.id]||'neon';g.skin=g.skin||'dark';BY[g.id]=g});
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t}return a}
+// Orden aleatorio donde nunca van dos juegos seguidos con la misma estética
+function sequence(list){
+  const pools={};list.forEach(g=>{(pools[g.style]=pools[g.style]||[]).push(g)});
+  for(const k in pools)shuffle(pools[k]);
+  const out=[];let prev=null;
+  for(let n=list.length;n>0;n--){
+    let keys=Object.keys(pools).filter(k=>pools[k].length&&k!==prev);
+    if(!keys.length)keys=Object.keys(pools).filter(k=>pools[k].length);
+    const max=Math.max.apply(null,keys.map(k=>pools[k].length));
+    const top=keys.filter(k=>pools[k].length>=max-1);
+    const k=top[Math.floor(Math.random()*top.length)];
+    out.push(pools[k].pop());prev=k;
+  }
+  return out;
+}
+let LIST=sequence(GAMES.slice());
+{const want=new URLSearchParams(location.search).get('g'),i=LIST.findIndex(g=>g.id===want);if(i>0)LIST=LIST.slice(i).concat(LIST.slice(0,i))}
 
 const feed=$('#feed');
-let favs=store.get('favs',[]),mode='all',started=false,active=null,cards=[],lastIdx=0,wt=0;
+let favs=store.get('favs',[]),mode='all',started=false,active=null,cards=[],L=0;
 
 function roundRect(ctx,x,y,w,h,r){r=Math.max(0,Math.min(r,w/2,h/2));ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
 
@@ -44,7 +61,7 @@ function mount(card){
   c.after=(ms,f)=>{const id=setTimeout(()=>{if(alive)f()},ms);timers.push(id);return id};
   c.setScore=n=>{c.sc=n;hudScore.textContent=n;hudScore.classList.remove('pop');void hudScore.offsetWidth;hudScore.classList.add('pop')};
   c.sfx=(n,p)=>window.Aud.sfx(n,p);
-  c.vib=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
+  c.vib=ms=>{try{if(navigator.userActivation&&!navigator.userActivation.hasBeenActive)return;navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
   c.shake=n=>{shakeA=Math.max(shakeA,n)};
   c.say=(t,ms)=>{toastEl.textContent=t;toastEl.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('on'),ms||2200)};
   c.rr=(x,y,w,h,r)=>roundRect(g2,x,y,w,h,r);
@@ -67,6 +84,9 @@ function mount(card){
       $('.os',overEl).textContent=c.sc;
       $('.ob',overEl).textContent=nb?'🏆 ¡NUEVO RÉCORD!':('Récord: '+c.best)+(sub?' · '+sub:'');
       overEl.classList.add('show');overReady=performance.now()+450;
+      let n=3;const nx=$('.nx',overEl);nx.textContent='siguiente juego en '+n+'…';
+      const tick=()=>{n--;if(n<=0){nx.textContent='';window.TG.next();return}nx.textContent='siguiente juego en '+n+'…';c.after(1000,tick)};
+      c.after(1000,tick);
     });
   };
   function clearAll(){timers.forEach(clearTimeout);timers=[];hs={down:[],move:[],up:[]};loops=[];parts=[];floats=[];for(const k in ptr)delete ptr[k]}
@@ -117,6 +137,7 @@ function mount(card){
   last=performance.now();raf=requestAnimationFrame(frame);
 
   return{
+    c,
     destroy(){
       alive=false;cancelAnimationFrame(raf);timers.forEach(clearTimeout);clearTimeout(toastT);
       if(cv.parentNode)cv.parentNode.removeChild(cv);
@@ -128,12 +149,12 @@ function mount(card){
 
 // ---------- Tarjetas ----------
 function makeCard(g){
-  const el=document.createElement('section');el.className='card';el._g=g;
+  const el=document.createElement('section');el.className='card '+g.skin.split(' ').map(k=>'sk-'+k).join(' ');el._g=g;
   el.style.setProperty('--c1',g.colors[0]);el.style.setProperty('--c2',g.colors[1]);el.style.setProperty('--ac',g.colors[2]);el.style.setProperty('--font',g.font);
   el.innerHTML='<div class="poster"><div class="pe">'+g.emoji+'</div><div class="pt">'+g.title+'</div><div class="ps">toca para jugar</div></div>'+
     '<div class="stage"></div><div class="hud"><div class="score"></div><div class="hint"><span></span></div><div class="toast"></div></div>'+
     '<div class="intro">'+g.title+'</div>'+
-    '<div class="over"><div class="ot"></div><div class="os"></div><div class="ob"></div><div class="or">TOCA PARA REINTENTAR</div></div>'+
+    '<div class="over"><div class="ot"></div><div class="os"></div><div class="ob"></div><div class="or">TOCA PARA REINTENTAR</div><div class="nx"></div></div>'+
     '<div class="meta"><div><b>'+g.emoji+' '+g.title+'</b><span>#'+g.tag+'</span></div><button class="heart" aria-label="favorito">♥</button></div>';
   const hb=$('.heart',el);hb.classList.toggle('on',favs.indexOf(g.id)>=0);
   hb.addEventListener('pointerdown',e=>e.stopPropagation());
@@ -158,6 +179,7 @@ function toggleFav(id,btn){
   const i=favs.indexOf(id),on=i<0;
   if(on)favs.push(id);else favs.splice(i,1);
   store.set('favs',favs);btn.classList.remove('on');void btn.offsetWidth;btn.classList.toggle('on',on);
+  cards.forEach(cd=>{if(cd._g&&cd._g.id===id&&cd!==btn.closest('.card'))$('.heart',cd).classList.toggle('on',on)});
   updateTabs();
   if(on){
     for(let k=0;k<6;k++){const h=document.createElement('div');h.className='fh';h.textContent='♥';h.style.right=(24+Math.random()*30)+'px';h.style.bottom='46px';h.style.setProperty('--dx',((Math.random()-.5)*80)+'px');h.style.animationDelay=(k*.04)+'s';btn.closest('.card').appendChild(h);setTimeout(()=>h.remove(),1100)}
@@ -166,12 +188,12 @@ function toggleFav(id,btn){
 function updateTabs(){$('#tab-favs').textContent='Favoritos ♥'+(favs.length?' '+favs.length:'')}
 
 function build(){
-  io&&io.disconnect();feed.innerHTML='';cards=[];
-  const list=mode==='favs'?LIST.filter(g=>favs.indexOf(g.id)>=0):LIST;
-  if(!list.length){const e=emptyCard();feed.appendChild(e);cards.push(e);return}
-  list.forEach(g=>{const el=makeCard(g);feed.appendChild(el);cards.push(el)});
-  if(mode==='all'){const e=endCard();feed.appendChild(e);cards.push(e)}
-  cards.forEach(el=>io&&io.observe(el));
+  feed.innerHTML='';cards=[];
+  const base=mode==='favs'?LIST.filter(g=>favs.indexOf(g.id)>=0):LIST;
+  if(!base.length){L=0;const e=emptyCard();feed.appendChild(e);cards.push(e);return}
+  L=base.length;
+  // 3 copias de la lista: siempre se salta a la copia central, así el feed no tiene fin
+  for(let k=0;k<3;k++)base.forEach(g=>{const el=makeCard(g);feed.appendChild(el);cards.push(el)});
 }
 
 // ---------- Activación ----------
@@ -179,27 +201,34 @@ function setActive(card){
   if(active&&active.card===card)return;
   if(active){active.run&&active.run.destroy();active.card.classList.remove('active');active=null}
   window.Aud.stop();
+  $('#app').classList.toggle('light',!!(card&&card._g&&(' '+card._g.skin+' ').indexOf(' light ')>=0));
   if(!card)return;
   card.classList.add('active');
   if(card._g){active={card,run:mount(card)};window.Aud.play(card._g.music,card._g.id)}
   else active={card,run:null};
 }
-function curIdx(){return Math.max(0,Math.min(cards.length-1,Math.round(feed.scrollTop/(feed.clientHeight||1))))}
-function want(card){clearTimeout(wt);wt=setTimeout(()=>{if(started)setActive(card)},90)}
-const io=window.IntersectionObserver?new IntersectionObserver(es=>{for(const e of es)if(e.isIntersecting&&e.intersectionRatio>=.5)want(e.target)},{root:feed,threshold:[.5]}):null;
+// Cuando el scroll se asienta: si estamos en una copia lateral saltamos a la central (sin que se note) y arrancamos ese juego
 let st=0;
+function settle(){
+  if(!started||!cards.length)return;
+  const h=feed.clientHeight||1;let i=Math.max(0,Math.min(cards.length-1,Math.round(feed.scrollTop/h)));
+  if(L&&(i<L||i>=2*L)){
+    i=L+(i%L);
+    feed.style.scrollSnapType='none';feed.scrollTop=i*h;
+    requestAnimationFrame(()=>{feed.style.scrollSnapType=''});
+  }
+  setActive(cards[i]);
+}
 feed.addEventListener('scroll',()=>{
-  if(feed.scrollTop>30)hideSwipe(true);
-  clearTimeout(st);st=setTimeout(()=>{if(started&&cards[curIdx()])want(cards[curIdx()])},160);
+  if(Math.abs(feed.scrollTop-L*(feed.clientHeight||1))>30)hideSwipe(true);
+  clearTimeout(st);st=setTimeout(settle,140);
 },{passive:true});
 
 function setMode(m){
   if(m===mode)return;
-  if(mode==='all')lastIdx=curIdx();
   setActive(null);mode=m;build();
   $('#tab-all').classList.toggle('on',m==='all');$('#tab-favs').classList.toggle('on',m==='favs');
-  feed.scrollTop=(m==='all'&&lastIdx)?lastIdx*feed.clientHeight:0;
-  if(started)want(cards[curIdx()]);
+  feed.scrollTop=L*feed.clientHeight;settle();
 }
 
 // ---------- Pistas de swipe ----------
@@ -212,19 +241,21 @@ $('#tab-all').onclick=()=>setMode('all');
 $('#tab-favs').onclick=()=>setMode('favs');
 const muteBtn=$('#mute');
 window.Aud.on=!store.get('mute',false);muteBtn.textContent=window.Aud.on?'🔊':'🔇';
+window.Aud.init();
 muteBtn.onclick=()=>{window.Aud.setOn(!window.Aud.on);store.set('mute',!window.Aud.on);muteBtn.textContent=window.Aud.on?'🔊':'🔇'};
-$('#splash').addEventListener('click',()=>{
-  if(started)return;started=true;window.Aud.init();window.Aud.resume();
-  const sp=$('#splash');sp.classList.add('out');setTimeout(()=>sp.remove(),600);
-  setActive(cards[curIdx()]);
-  if(!store.get('swiped',false))swipeT=setTimeout(()=>{if(feed.scrollTop<30)swipeEl.classList.add('on')},5500);
-});
-document.addEventListener('pointerup',()=>window.Aud.resume(),{passive:true});
+// El navegador no deja sonar hasta el primer toque: en cuanto llega, se activa el audio
+['pointerdown','pointerup','touchend','keydown','click'].forEach(ev=>document.addEventListener(ev,()=>window.Aud.resume(),{passive:true,capture:true}));
 document.addEventListener('visibilitychange',()=>{if(document.hidden)window.Aud.pause();else window.Aud.resume()});
 window.addEventListener('keydown',e=>{
-  if(e.key==='ArrowDown'||e.key==='PageDown'){e.preventDefault();feed.scrollBy({top:feed.clientHeight,behavior:'smooth'})}
+  if(e.key==='ArrowDown'||e.key==='PageDown'){e.preventDefault();TG.next()}
   else if(e.key==='ArrowUp'||e.key==='PageUp'){e.preventDefault();feed.scrollBy({top:-feed.clientHeight,behavior:'smooth'})}
 });
 let rt=0;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{active&&active.run&&active.run.resize()},200)});
-window.TG={setMode,setActive,get cards(){return cards},get active(){return active},start(){document.getElementById('splash')&&document.getElementById('splash').click()}};
+window.TG={setMode,setActive,next(){feed.scrollBy({top:feed.clientHeight,behavior:'smooth'})},
+  goto(id){const i=cards.findIndex((c,k)=>k>=L&&c._g&&c._g.id===id);if(i>=0){feed.scrollTop=i*feed.clientHeight;settle()}},
+  get cards(){return cards},get active(){return active},get list(){return LIST}};
+// Un juego arranca nada más abrir la página
+started=true;
+requestAnimationFrame(()=>{feed.scrollTop=L*feed.clientHeight;settle();
+  if(!store.get('swiped',false))swipeT=setTimeout(()=>{if(feed.scrollTop<=L*feed.clientHeight+30)swipeEl.classList.add('on')},6500)});
 })();

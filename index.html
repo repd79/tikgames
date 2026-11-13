@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>TikGames</title>
+<title>TikGamesX</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Bangers&family=Black+Ops+One&family=Bowlby+One&family=Baloo+2:wght@800&family=Bungee&family=Caveat+Brush&family=Chewy&family=Cinzel:wght@900&family=Creepster&family=Dela+Gothic+One&family=Fredoka:wght@700&family=Lobster&family=Londrina+Solid:wght@900&family=Luckiest+Guy&family=Orbitron:wght@900&family=Pacifico&family=Patrick+Hand&family=Press+Start+2P&family=Righteous&family=Rye&family=Shrikhand&family=Silkscreen:wght@700&family=Sniglet:wght@800&family=Titan+One&family=VT323&family=Monoton&family=Archivo+Black&family=Space+Mono:wght@700&family=Abril+Fatface&family=Special+Elite&family=Bebas+Neue&family=Share+Tech+Mono&family=Rubik+Mono+One&family=Playfair+Display:wght@900&family=Permanent+Marker&display=swap" rel="stylesheet">
@@ -50,17 +50,33 @@ html,body{height:100%;background:#000;overflow:hidden;font-family:system-ui,-app
 #top button{pointer-events:auto;background:none;border:0;color:#fff;font:800 16px system-ui,sans-serif;opacity:.6;padding:6px 2px;text-shadow:0 2px 6px #000a;border-bottom:3px solid transparent;cursor:pointer}
 #top button.on{opacity:1;border-color:#fff}
 #top #mute{position:absolute;right:14px;top:calc(env(safe-area-inset-top) + 8px);opacity:.85;border:0;font-size:20px}
-#splash{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(circle at 50% 40%,#3a0a6b,#0a0014 70%);cursor:pointer;transition:opacity .5s,transform .5s}
-#splash.out{opacity:0;transform:scale(1.15);pointer-events:none}
-#splash h1{font-family:'Bungee',Impact,sans-serif;font-size:58px;background:linear-gradient(90deg,#ff2e93,#ffd60a,#00f0ff,#ff2e93);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 3s linear infinite}
-#splash p{opacity:.75;font-weight:700;letter-spacing:3px;font-size:14px;text-transform:uppercase}
-#splash .go{margin-top:26px;padding:15px 30px;border-radius:999px;background:#fff;color:#000;font-weight:900;letter-spacing:1px;animation:pulse 1s infinite}
-#splash .em{position:absolute;font-size:44px;opacity:.5;animation:float 4s ease-in-out infinite}
 #swipe{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 96px);z-index:15;text-align:center;font-weight:800;pointer-events:none;opacity:0;transition:opacity .5s;max-width:480px;margin:auto;text-shadow:0 2px 8px #000}
 #swipe.on{opacity:1;animation:bob 1.2s infinite}
 .endcard{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:30px}
 .endcard h2{font-family:'Bungee',sans-serif;font-size:30px}
 .endcard button{margin-top:14px;padding:13px 24px;border-radius:999px;border:0;font-weight:900;font-size:15px;background:#fff;color:#000;cursor:pointer}
+.nx{margin-top:10px;font-family:system-ui,sans-serif;font-weight:800;font-size:13px;letter-spacing:.4px;opacity:.75}
+/* Skins: cambian el aspecto del HUD y de la pantalla de fin según la estética del juego */
+.sk-flat .score,.sk-flat .toast,.sk-flat .intro{text-shadow:3px 3px 0 rgba(0,0,0,.55)}
+.sk-flat .ot{text-shadow:3px 3px 0 rgba(0,0,0,.6)}
+.sk-flat .over{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(0,0,0,.72)}
+.sk-flat .or{border-radius:0;animation:none;box-shadow:4px 4px 0 rgba(0,0,0,.6)}
+.sk-flat .meta{background:linear-gradient(transparent,rgba(0,0,0,.8))}
+.sk-flat .heart{border-radius:6px;backdrop-filter:none;-webkit-backdrop-filter:none}
+.sk-light .score{color:#16161d;text-shadow:0 2px 0 rgba(255,255,255,.55)}
+.sk-light .hint span{background:rgba(255,255,255,.82);color:#16161d}
+.sk-light .toast{color:#16161d;text-shadow:0 2px 0 rgba(255,255,255,.7)}
+.sk-light .intro{color:#16161d;text-shadow:0 4px 0 rgba(255,255,255,.65)}
+.sk-light .over{background:rgba(250,246,238,.82);backdrop-filter:none;-webkit-backdrop-filter:none;color:#16161d}
+.sk-light .ot{text-shadow:none;color:#16161d}
+.sk-light .or{color:#fff;mix-blend-mode:normal}
+.sk-light .meta{background:linear-gradient(transparent,rgba(255,255,255,.78))}
+.sk-light .meta b,.sk-light .meta span{color:#16161d;text-shadow:none}
+.sk-light .heart{background:rgba(0,0,0,.09);color:#16161d;backdrop-filter:none;-webkit-backdrop-filter:none}
+.sk-light .poster .pt{text-shadow:0 3px 0 rgba(255,255,255,.6);color:#16161d}
+#app.light #top button{color:#16161d;text-shadow:none}
+#app.light #top button.on{border-color:#16161d}
+#app.light #swipe{color:#16161d;text-shadow:none}
 @keyframes float{50%{transform:translateY(-14px) rotate(4deg)}}
 @keyframes pop{0%{transform:scale(1.45)}100%{transform:scale(1)}}
 @keyframes pulse{50%{transform:scale(1.07)}}
@@ -79,13 +95,9 @@ html,body{height:100%;background:#000;overflow:hidden;font-family:system-ui,-app
   <div id="feed"></div>
   <div id="swipe">▲<br>desliza para otro juego</div>
 </div>
-<div id="splash">
-  <span class="em" style="left:10%;top:14%">🎮</span><span class="em" style="right:12%;top:22%;animation-delay:-1s">🪐</span>
-  <span class="em" style="left:16%;bottom:18%;animation-delay:-2s">🐸</span><span class="em" style="right:10%;bottom:14%;animation-delay:-3s">🍕</span>
-  <h1>TikGames</h1><p>desliza · juega · repite</p><div class="go">TOCA PARA EMPEZAR</div>
-</div>
 <script>window.GAMES=[];window.def=function(g){GAMES.push(g)};</script>
 <script src="js/audio.js"></script>
+<script src="js/style.js"></script>
 <script src="js/games/g1.js"></script>
 <script src="js/games/g2.js"></script>
 <script src="js/games/g3.js"></script>
@@ -94,6 +106,10 @@ html,body{height:100%;background:#000;overflow:hidden;font-family:system-ui,-app
 <script src="js/games/g6.js"></script>
 <script src="js/games/g7.js"></script>
 <script src="js/games/g8.js"></script>
+<script src="js/games/g9.js"></script>
+<script src="js/games/g10.js"></script>
+<script src="js/games/g11.js"></script>
+<script src="js/games/g12.js"></script>
 <script src="js/core.js"></script>
 </body>
 </html>
