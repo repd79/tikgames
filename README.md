@@ -3,7 +3,7 @@ Feed vertical de minijuegos al estilo TikTok. **Al abrir la página ya está jug
 cuando pierdes, tras una cuenta atrás de 3 s pasa solo al siguiente juego (toca la pantalla para reintentar el mismo),
 y al llegar al último vuelve a empezar. También puedes deslizar a mano, y ♥ guarda favoritos.
 
-57 juegos. El orden es aleatorio en cada visita y **nunca van dos juegos seguidos con la misma estética**.
+74 juegos. El orden es aleatorio en cada visita y **nunca van dos juegos seguidos con la misma estética**.
 Abre `index.html` (mejor servido: `python3 -m http.server`). `index.html?g=ID` arranca por un juego concreto (p. ej. `?g=wave`).
 
 ## Añadir juegos
@@ -32,3 +32,13 @@ Nuevo archivo en `js/games/`, `def({...})` y su `<script>` en `index.html`. Camp
 | CGA (4 colores) | Marcianos |
 | Memphis pop | Balancín |
 | Estampa japonesa (ukiyo-e) | Ola Grande |
+
+## Pack 8 bits (7) — `js/games/g14.js`
+Cada uno con la paleta de un ordenador o consola de los 80: Ladrillos (Amstrad CPC), Bombas (Atari 2600), Pong 64 (Commodore 64), Bloques ZX (ZX Spectrum), Saltitos (NES), Escuadrón (Master System) y Rata Queso (laberinto arcade).
+
+## Mesa y lógica (4) — `js/games/g15.js`
+Conecta 4 y Reversi contra la máquina (la IA sube de nivel con cada victoria), Cajas (sokoban infinito con niveles generados y siempre resolubles) y Nonograma (puzles con solución garantizada). Los dos puzles tienen cuenta atrás y dan tiempo extra al resolver.
+
+## Juegos incrustados (6) — `js/games/g13.js` y carpeta `ext/`
+Juegos hechos aparte que se cargan en un `iframe` dentro del feed (`embed:` en `def`): Palabros (solo el modo de palabras), Nexo, Gatodoku (solo el modo de tableros, niveles al azar), Dojo Gamberro, Shobu Sumo y Laserinto.
+Cada tarjeta tiene un botón «siguiente» y una franja a cada lado para deslizar el feed. Las copias de `ext/` están adaptadas (sin menús ni enlaces de vuelta); los originales viven en la carpeta `games` de Raúl.

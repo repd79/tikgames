@@ -57,6 +57,11 @@ html,body{height:100%;background:#000;overflow:hidden;font-family:system-ui,-app
 .endcard button{margin-top:14px;padding:13px 24px;border-radius:999px;border:0;font-weight:900;font-size:15px;background:#fff;color:#000;cursor:pointer}
 .nx{margin-top:10px;font-family:system-ui,sans-serif;font-weight:800;font-size:13px;letter-spacing:.4px;opacity:.75}
 /* Skins: cambian el aspecto del HUD y de la pantalla de fin según la estética del juego */
+.card.embed .hud .score,.card.embed .poster .ps{display:none}
+.card.embed .intro{top:18%}
+.eg{position:absolute;top:0;bottom:0;width:14px;z-index:2;touch-action:pan-y}.eg.l{left:0}.eg.r{right:0}
+.skipb{position:absolute;z-index:8;right:78px;bottom:calc(env(safe-area-inset-bottom) + 24px);height:34px;padding:0 14px;border-radius:17px;border:0;background:rgba(255,255,255,.16);color:#fff;font:800 13px system-ui,sans-serif;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);cursor:pointer}
+.sk-light .skipb{background:rgba(0,0,0,.1);color:#16161d}
 .sk-flat .score,.sk-flat .toast,.sk-flat .intro{text-shadow:3px 3px 0 rgba(0,0,0,.55)}
 .sk-flat .ot{text-shadow:3px 3px 0 rgba(0,0,0,.6)}
 .sk-flat .over{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(0,0,0,.72)}
@@ -110,6 +115,9 @@ html,body{height:100%;background:#000;overflow:hidden;font-family:system-ui,-app
 <script src="js/games/g10.js"></script>
 <script src="js/games/g11.js"></script>
 <script src="js/games/g12.js"></script>
+<script src="js/games/g13.js"></script>
+<script src="js/games/g14.js"></script>
+<script src="js/games/g15.js"></script>
 <script src="js/core.js"></script>
 </body>
 </html>

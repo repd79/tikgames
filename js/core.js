@@ -34,7 +34,17 @@ function roundRect(ctx,x,y,w,h,r){r=Math.max(0,Math.min(r,w/2,h/2));ctx.moveTo(x
 function safe(){const p=$('#probe'),s=getComputedStyle(p);return{t:parseFloat(s.paddingTop)||0,b:parseFloat(s.paddingBottom)||0}}
 
 // ---------- Ejecución de un juego ----------
+function mountEmbed(card){
+  const g=card._g,stage=$('.stage',card),s=safe();
+  const fr=document.createElement('iframe');
+  fr.src=typeof g.embed==='function'?g.embed():g.embed;fr.className='emb';fr.title=g.title;fr.setAttribute('allow','autoplay;fullscreen');
+  fr.style.cssText='position:absolute;left:0;right:0;border:0;width:100%;top:'+(s.t+50)+'px;height:calc(100% - '+(s.t+50+76+s.b)+'px);background:'+g.colors[0];
+  stage.appendChild(fr);
+  ['l','r'].forEach(k=>{const d=document.createElement('div');d.className='eg '+k;stage.appendChild(d)});
+  return{c:null,frame:fr,destroy(){stage.innerHTML=''},resize(){}};
+}
 function mount(card){
+  if(card._g.embed)return mountEmbed(card);
   const g=card._g,stage=$('.stage',card),hudScore=$('.score',card),hintEl=$('.hint',card),toastEl=$('.toast',card),overEl=$('.over',card);
   const cv=document.createElement('canvas');
   cv.style.cssText='width:100%;height:100%;display:block;touch-action:pan-y';
@@ -109,7 +119,7 @@ function mount(card){
   // bucle
   function frame(ts){
     if(!alive)return;raf=requestAnimationFrame(frame);
-    const dt=Math.min(.05,(ts-last)/1000||0);last=ts;c.t+=dt;
+    const dt=Math.max(0,Math.min(.05,(ts-last)/1000||0));last=ts;c.t+=dt;
     g2.setTransform(dpr,0,0,dpr,0,0);g2.globalAlpha=1;g2.shadowBlur=0;g2.lineWidth=1;g2.setLineDash([]);
     const ls=loops.slice();
     for(let i=0;i<ls.length;i++){try{ls[i](dt,c.t)}catch(e){console.error('['+g.id+']',e);loops=loops.filter(f=>f!==ls[i])}}
@@ -149,13 +159,14 @@ function mount(card){
 
 // ---------- Tarjetas ----------
 function makeCard(g){
-  const el=document.createElement('section');el.className='card '+g.skin.split(' ').map(k=>'sk-'+k).join(' ');el._g=g;
+  const el=document.createElement('section');el.className='card '+(g.embed?'embed ':'')+g.skin.split(' ').map(k=>'sk-'+k).join(' ');el._g=g;
   el.style.setProperty('--c1',g.colors[0]);el.style.setProperty('--c2',g.colors[1]);el.style.setProperty('--ac',g.colors[2]);el.style.setProperty('--font',g.font);
   el.innerHTML='<div class="poster"><div class="pe">'+g.emoji+'</div><div class="pt">'+g.title+'</div><div class="ps">toca para jugar</div></div>'+
     '<div class="stage"></div><div class="hud"><div class="score"></div><div class="hint"><span></span></div><div class="toast"></div></div>'+
     '<div class="intro">'+g.title+'</div>'+
     '<div class="over"><div class="ot"></div><div class="os"></div><div class="ob"></div><div class="or">TOCA PARA REINTENTAR</div><div class="nx"></div></div>'+
-    '<div class="meta"><div><b>'+g.emoji+' '+g.title+'</b><span>#'+g.tag+'</span></div><button class="heart" aria-label="favorito">♥</button></div>';
+    '<div class="meta"><div><b>'+g.emoji+' '+g.title+'</b><span>#'+g.tag+'</span></div><button class="heart" aria-label="favorito">♥</button></div>'+(g.embed?'<button class="skipb" aria-label="siguiente juego">siguiente ⏭</button>':'');
+  if(g.embed){const sb=$('.skipb',el);sb.addEventListener('pointerdown',e=>e.stopPropagation());sb.addEventListener('click',e=>{e.stopPropagation();window.TG.next()})}
   const hb=$('.heart',el);hb.classList.toggle('on',favs.indexOf(g.id)>=0);
   hb.addEventListener('pointerdown',e=>e.stopPropagation());
   hb.addEventListener('click',e=>{e.stopPropagation();toggleFav(g.id,hb)});
@@ -204,7 +215,7 @@ function setActive(card){
   $('#app').classList.toggle('light',!!(card&&card._g&&(' '+card._g.skin+' ').indexOf(' light ')>=0));
   if(!card)return;
   card.classList.add('active');
-  if(card._g){active={card,run:mount(card)};window.Aud.play(card._g.music,card._g.id)}
+  if(card._g){active={card,run:mount(card)};if(card._g.music)window.Aud.play(card._g.music,card._g.id)}
   else active={card,run:null};
 }
 // Cuando el scroll se asienta: si estamos en una copia lateral saltamos a la central (sin que se note) y arrancamos ese juego

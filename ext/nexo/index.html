@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#192231"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="Une números vecinos, encuentra caminos que suman el objetivo y llena el tablero de colores."><title>Nexo · Un número lleva a otro</title><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css?v=1.0.1"><style>.top,.back,aside{display:none!important}</style></head>
+<body>
+<header class="top"><a class="brand" href="../" aria-label="Volver a Palabros"><img src="icon.svg" alt="">nexo<span>.</span></a><nav><button id="sound" class="icon" aria-label="Silenciar sonido" title="Sonido">♫</button><button id="help" class="icon" aria-label="Cómo jugar">?</button></nav></header>
+<main>
+ <section class="game" aria-label="Juego de caminos de sumas">
+  <div class="game-top"><a class="back" href="../" aria-label="Volver a Palabros">‹</a><div class="level-block"><span class="eyebrow">UN NÚMERO LLEVA A OTRO</span><h1>Nivel <span id="level">1</span> <span class="spark">✧</span></h1></div><div class="points"><span>✦</span><b id="score">0</b><small>puntos</small></div></div>
+  <div class="target"><span>CADA CAMINO SUMA</span><strong id="target">—</strong><div><span id="currentSum">Une números<br>vecinos</span></div></div>
+  <div class="progress" role="progressbar" aria-label="Caminos oficiales encontrados" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progressFill"></div></div>
+  <div class="board-meta"><span id="boardLabel"></span><span id="counter"></span></div>
+  <div class="board-wrap"><div id="board" role="group" aria-label="Tablero: une números vecinos en horizontal o vertical"><svg id="connections" aria-hidden="true"></svg></div><div id="reward" aria-hidden="true"></div></div>
+  <p id="message" class="message" role="status" aria-live="polite">Arrastra por números vecinos y suelta al terminar.</p>
+  <div id="paths" class="paths" aria-label="Caminos oficiales por encontrar"></div>
+  <div class="tools"><button id="hint">☀ <span>Pista</span></button><button id="check">✓ <span>Comprobar</span></button><button id="undo">↶ <span>Deshacer</span></button></div>
+  <div class="foot"><span id="saveState">◉ Progreso guardado</span><button id="another">Otro tablero</button></div>
+ </section>
+ <aside><div class="eyebrow">EL TABLERO ENTERO TIENE SOLUCIÓN</div><h2>Una suma.<br><em>Muchos caminos.</em></h2><p>Une números que estén al lado: arriba, abajo, izquierda o derecha. Puedes girar, pero no saltar ni ir en diagonal.</p><div class="legend"><i></i><p>Los caminos del puzle se quedan de su color.</p></div><div class="legend bonus"><i>✦</i><p>¿Otra suma correcta? ¡Bonus! Ganas puntos y las casillas quedan libres.</p></div><p class="note">Más rápido, más puntos: cada camino tiene un extra de rapidez. Sin cuenta atrás. Empieza con parejas en 2 × 2; los caminos crecen contigo.</p><a href="../">¿Prefieres letras? Juega a Palabros ↗</a></aside>
+</main>
+<dialog id="modal" aria-labelledby="modalTitle"><div id="modalContent"></div></dialog><div id="confetti" aria-hidden="true"></div>
+<script src="engine.js?v=1.0.1"></script><script src="game.js?v=1.0.1"></script></body></html>
