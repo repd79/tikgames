@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>TikGames</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Bangers&family=Black+Ops+One&family=Bowlby+One&family=Baloo+2:wght@800&family=Bungee&family=Caveat+Brush&family=Chewy&family=Cinzel:wght@900&family=Creepster&family=Dela+Gothic+One&family=Fredoka:wght@700&family=Lobster&family=Londrina+Solid:wght@900&family=Luckiest+Guy&family=Orbitron:wght@900&family=Pacifico&family=Patrick+Hand&family=Press+Start+2P&family=Righteous&family=Rye&family=Shrikhand&family=Silkscreen:wght@700&family=Sniglet:wght@800&family=Titan+One&family=VT323&family=Monoton&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html,body{height:100%;background:#000;overflow:hidden;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#fff;overscroll-behavior:none}
+#app{position:fixed;inset:0;display:flex;justify-content:center;background:#000}
+#feed{width:100%;max-width:480px;height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior:contain;position:relative}
+#feed::-webkit-scrollbar{display:none}
+#probe{position:fixed;top:0;left:0;visibility:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);pointer-events:none}
+.card{position:relative;height:100%;width:100%;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:linear-gradient(160deg,var(--c1),var(--c2))}
+.poster{position:absolute;inset:0;z-index:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:radial-gradient(circle at 50% 42%,color-mix(in srgb,var(--ac) 35%,transparent),transparent 62%)}
+.pe{font-size:128px;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 8px 24px rgba(0,0,0,.4))}
+.pt{font-family:var(--font);font-size:38px;color:#fff;text-shadow:0 0 26px var(--ac),0 4px 0 rgba(0,0,0,.3);text-align:center;padding:0 18px;line-height:1.1}
+.ps{font-weight:800;opacity:.7;letter-spacing:2px;font-size:13px;text-transform:uppercase}
+.stage{position:absolute;inset:0;z-index:1}
+.hud{position:absolute;inset:0;z-index:3;pointer-events:none}
+.score{position:absolute;top:calc(env(safe-area-inset-top) + 50px);left:16px;font-family:var(--font);font-size:42px;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.35),0 0 18px var(--ac);opacity:.92}
+.score.pop{animation:pop .25s ease-out}
+.hint{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 100px);text-align:center;opacity:0;transition:opacity .4s}
+.hint.on{opacity:1}
+.hint span{display:inline-block;padding:9px 16px;border-radius:999px;background:rgba(0,0,0,.55);font-weight:800;font-size:15px;letter-spacing:.3px;animation:pulse 1.2s infinite}
+.toast{position:absolute;left:0;right:0;top:34%;text-align:center;font-family:var(--font);font-size:26px;text-shadow:0 3px 10px #000a,0 0 16px var(--ac);opacity:0;transform:translateY(10px);transition:all .3s;padding:0 20px}
+.toast.on{opacity:1;transform:none}
+.intro{position:absolute;left:0;right:0;top:32%;z-index:4;text-align:center;font-family:var(--font);font-size:46px;line-height:1.05;padding:0 16px;color:#fff;text-shadow:0 0 22px var(--ac),0 5px 0 rgba(0,0,0,.35);opacity:0;pointer-events:none}
+.card.active .intro{animation:intro 1.15s ease-out}
+.over{position:absolute;inset:0;z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(0,0,0,.58);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);text-align:center;font-family:var(--font);padding-bottom:70px}
+.over.show{display:flex;animation:fade .3s}
+.ot{font-size:34px;color:var(--ac);padding:0 14px;text-shadow:0 0 18px var(--ac)}
+.os{font-size:92px;line-height:1}
+.ob{opacity:.85;font-family:system-ui,sans-serif;font-weight:800;font-size:15px}
+.or{margin-top:18px;padding:13px 24px;border-radius:999px;background:var(--ac);color:#000;font-family:system-ui,sans-serif;font-weight:900;font-size:15px;letter-spacing:.5px;animation:pulse 1s infinite}
+.meta{position:absolute;left:0;right:0;bottom:0;z-index:7;padding:26px 16px calc(env(safe-area-inset-bottom) + 12px);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(transparent,rgba(0,0,0,.65));pointer-events:none}
+.meta b{display:block;font-size:17px;text-shadow:0 2px 6px #000}
+.meta span{font-size:13px;opacity:.8;font-weight:700}
+.heart{pointer-events:auto;width:54px;height:54px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:28px;line-height:54px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);cursor:pointer;transition:transform .15s}
+.heart:active{transform:scale(.88)}
+.heart.on{color:#ff2d55;background:rgba(255,45,85,.2);animation:beat .4s}
+.fh{position:absolute;z-index:9;font-size:22px;color:#ff2d55;pointer-events:none;animation:fly .9s ease-out forwards}
+#top{position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:20;padding:calc(env(safe-area-inset-top) + 10px) 14px 6px;display:flex;align-items:center;justify-content:center;gap:22px;pointer-events:none}
+#top button{pointer-events:auto;background:none;border:0;color:#fff;font:800 16px system-ui,sans-serif;opacity:.6;padding:6px 2px;text-shadow:0 2px 6px #000a;border-bottom:3px solid transparent;cursor:pointer}
+#top button.on{opacity:1;border-color:#fff}
+#top #mute{position:absolute;right:14px;top:calc(env(safe-area-inset-top) + 8px);opacity:.85;border:0;font-size:20px}
+#splash{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(circle at 50% 40%,#3a0a6b,#0a0014 70%);cursor:pointer;transition:opacity .5s,transform .5s}
+#splash.out{opacity:0;transform:scale(1.15);pointer-events:none}
+#splash h1{font-family:'Bungee',Impact,sans-serif;font-size:58px;background:linear-gradient(90deg,#ff2e93,#ffd60a,#00f0ff,#ff2e93);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 3s linear infinite}
+#splash p{opacity:.75;font-weight:700;letter-spacing:3px;font-size:14px;text-transform:uppercase}
+#splash .go{margin-top:26px;padding:15px 30px;border-radius:999px;background:#fff;color:#000;font-weight:900;letter-spacing:1px;animation:pulse 1s infinite}
+#splash .em{position:absolute;font-size:44px;opacity:.5;animation:float 4s ease-in-out infinite}
+#swipe{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 96px);z-index:15;text-align:center;font-weight:800;pointer-events:none;opacity:0;transition:opacity .5s;max-width:480px;margin:auto;text-shadow:0 2px 8px #000}
+#swipe.on{opacity:1;animation:bob 1.2s infinite}
+.endcard{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:30px}
+.endcard h2{font-family:'Bungee',sans-serif;font-size:30px}
+.endcard button{margin-top:14px;padding:13px 24px;border-radius:999px;border:0;font-weight:900;font-size:15px;background:#fff;color:#000;cursor:pointer}
+@keyframes float{50%{transform:translateY(-14px) rotate(4deg)}}
+@keyframes pop{0%{transform:scale(1.45)}100%{transform:scale(1)}}
+@keyframes pulse{50%{transform:scale(1.07)}}
+@keyframes intro{0%{opacity:0;transform:scale(2.4) rotate(-4deg)}22%{opacity:1;transform:scale(1) rotate(0)}75%{opacity:1}100%{opacity:0;transform:scale(.92)}}
+@keyframes fade{from{opacity:0}}
+@keyframes beat{40%{transform:scale(1.35)}}
+@keyframes fly{to{transform:translate(var(--dx),-130px) scale(1.5);opacity:0}}
+@keyframes shine{to{background-position:300% 0}}
+@keyframes bob{50%{transform:translateY(-10px)}}
+</style>
+</head>
+<body>
+<div id="probe"></div>
+<div id="app">
+  <div id="top"><button id="tab-all" class="on">Para ti</button><button id="tab-favs">Favoritos ♥</button><button id="mute">🔊</button></div>
+  <div id="feed"></div>
+  <div id="swipe">▲<br>desliza para otro juego</div>
+</div>
+<div id="splash">
+  <span class="em" style="left:10%;top:14%">🎮</span><span class="em" style="right:12%;top:22%;animation-delay:-1s">🪐</span>
+  <span class="em" style="left:16%;bottom:18%;animation-delay:-2s">🐸</span><span class="em" style="right:10%;bottom:14%;animation-delay:-3s">🍕</span>
+  <h1>TikGames</h1><p>desliza · juega · repite</p><div class="go">TOCA PARA EMPEZAR</div>
+</div>
+<script>window.GAMES=[];window.def=function(g){GAMES.push(g)};</script>
+<script src="js/audio.js"></script>
+<script src="js/games/g1.js"></script>
+<script src="js/games/g2.js"></script>
+<script src="js/games/g3.js"></script>
+<script src="js/games/g4.js"></script>
+<script src="js/games/g5.js"></script>
+<script src="js/core.js"></script>
+</body>
+</html>
