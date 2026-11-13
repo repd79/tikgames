@@ -3,7 +3,7 @@ Feed vertical de minijuegos al estilo TikTok. **Al abrir la página ya está jug
 cuando pierdes, tras una cuenta atrás de 3 s pasa solo al siguiente juego (toca la pantalla para reintentar el mismo),
 y al llegar al último vuelve a empezar. También puedes deslizar a mano, y ♥ guarda favoritos.
 
-74 juegos. El orden es aleatorio en cada visita y **nunca van dos juegos seguidos con la misma estética**.
+80 juegos. El orden es aleatorio en cada visita y **nunca van dos juegos seguidos con la misma estética**.
 Abre `index.html` (mejor servido: `python3 -m http.server`). `index.html?g=ID` arranca por un juego concreto (p. ej. `?g=wave`).
 
 ## Añadir juegos
@@ -42,3 +42,7 @@ Conecta 4 y Reversi contra la máquina (la IA sube de nivel con cada victoria), 
 ## Juegos incrustados (6) — `js/games/g13.js` y carpeta `ext/`
 Juegos hechos aparte que se cargan en un `iframe` dentro del feed (`embed:` en `def`): Palabros (solo el modo de palabras), Nexo, Gatodoku (solo el modo de tableros, niveles al azar), Dojo Gamberro, Shobu Sumo y Laserinto.
 Cada tarjeta tiene un botón «siguiente» y una franja a cada lado para deslizar el feed. Las copias de `ext/` están adaptadas (sin menús ni enlaces de vuelta); los originales viven en la carpeta `games` de Raúl.
+
+## Iconos y créditos
+- Interfaz: iconos de línea de [Lucide](https://lucide.dev) (licencia ISC), uno por juego, en `js/icons.js`.
+- Sprites de los juegos antiguos (animales, comida…): ilustraciones de [Twemoji](https://github.com/jdecked/twemoji) (gráficos CC-BY 4.0), copiadas en `js/tw/` para que se vean igual en cualquier móvil.

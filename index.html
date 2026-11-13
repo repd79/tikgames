@@ -61,6 +61,38 @@ html,body{height:100%;background:#000;overflow:hidden;font-family:system-ui,-app
 .endcard button{margin-top:14px;padding:13px 24px;border-radius:999px;border:0;font-weight:900;font-size:15px;background:#fff;color:#000;cursor:pointer}
 .nx{margin-top:10px;font-family:system-ui,sans-serif;font-weight:800;font-size:13px;letter-spacing:.4px;opacity:.75}
 /* Skins: cambian el aspecto del HUD y de la pantalla de fin según la estética del juego */
+.ic{display:inline-block;vertical-align:-.2em;flex:none}
+.pe{color:var(--ac)}.pe .ic{filter:drop-shadow(0 0 14px color-mix(in srgb,var(--ac) 55%,transparent))}
+.meta b{display:flex;align-items:center;gap:8px}.meta b .mi{display:inline-flex;color:var(--ac)}.sk-light .meta b .mi{color:#16161d}
+.hint span{display:inline-flex;align-items:center;gap:8px}
+.ob .ic{vertical-align:-.15em;margin-right:2px}
+.eic{color:#fff;opacity:.9;margin-bottom:6px}.eic .ic{display:block;margin:0 auto}
+.skipb{display:inline-flex;align-items:center;gap:6px}
+#top #mute{display:flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;color:#fff}
+
+/* botones */
+#top{gap:10px!important}
+#top .seg{pointer-events:auto;display:flex;gap:2px;padding:4px;border-radius:999px;background:rgba(10,10,20,.42);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px) saturate(1.4);-webkit-backdrop-filter:blur(10px) saturate(1.4);box-shadow:0 4px 18px rgba(0,0,0,.28)}
+#top .seg button{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;border:0;background:transparent;opacity:.72;font:800 14px system-ui,sans-serif;text-shadow:none;transition:background .2s,opacity .2s,transform .12s}
+#top .seg button:active{transform:scale(.95)}
+#top .seg button.on{opacity:1;background:rgba(255,255,255,.2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22);border-color:transparent}
+#top .seg .cn{font-style:normal;font-size:11px;background:#ff3d6e;color:#fff;border-radius:9px;padding:1px 6px;margin-left:1px}
+#top #mute{position:static!important;margin-left:2px;width:40px;height:40px;border-radius:50%;background:rgba(10,10,20,.42);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 4px 18px rgba(0,0,0,.28);opacity:1;transition:transform .12s}
+#top #mute:active{transform:scale(.9)}
+#app.light #top .seg,#app.light #top #mute{background:rgba(255,255,255,.6);border-color:rgba(0,0,0,.08);box-shadow:0 4px 14px rgba(0,0,0,.12)}
+#app.light #top .seg button.on{background:rgba(0,0,0,.09);box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+#app.light #top #mute{color:#16161d}
+.heart{display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.18)!important;font-size:0;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.heart svg{transition:fill .2s,stroke .2s,transform .2s}
+.heart.on{color:#ff3d6e;background:rgba(255,61,110,.18);border-color:rgba(255,61,110,.5)!important}
+.heart.on svg{fill:#ff3d6e;stroke:#ff3d6e}
+.fh{display:flex}
+.or{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(180deg,color-mix(in srgb,var(--ac) 82%,#fff),var(--ac))!important;box-shadow:0 5px 0 color-mix(in srgb,var(--ac) 55%,#000),0 10px 24px rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.35)}
+.or .ic{animation:none}
+.sk-flat .or{box-shadow:4px 4px 0 rgba(0,0,0,.6)!important;border:0}
+.skipb{background:linear-gradient(135deg,rgba(255,255,255,.26),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.22);box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.sk-light .skipb{background:rgba(255,255,255,.65);border-color:rgba(0,0,0,.08)}
+.endcard button{display:inline-flex;align-items:center;gap:8px}
 .card.embed .hud .score,.card.embed .poster .ps{display:none}
 .card.embed .intro{top:18%}
 .eg{position:absolute;top:0;bottom:0;width:14px;z-index:2;touch-action:pan-y}.eg.l{left:0}.eg.r{right:0}
@@ -100,11 +132,12 @@ html,body{height:100%;background:#000;overflow:hidden;font-family:system-ui,-app
 <body>
 <div id="probe"></div>
 <div id="app">
-  <div id="top"><button id="tab-all" class="on">Para ti</button><button id="tab-favs">Favoritos ♥</button><button id="mute">🔊</button></div>
+  <div id="top"><div class="seg"><button id="tab-all" class="on">Para ti</button><button id="tab-favs">Favoritos</button></div><button id="mute"></button></div>
   <div id="feed"></div>
   <div id="swipe">▲<br>desliza para otro juego</div>
 </div>
 <script>window.GAMES=[];window.def=function(g){GAMES.push(g)};</script>
+<script src="js/icons.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/style.js"></script>
 <script src="js/games/g1.js"></script>
@@ -122,6 +155,7 @@ html,body{height:100%;background:#000;overflow:hidden;font-family:system-ui,-app
 <script src="js/games/g13.js"></script>
 <script src="js/games/g14.js"></script>
 <script src="js/games/g15.js"></script>
+<script src="js/games/g16.js"></script>
 <script src="js/core.js"></script>
 </body>
 </html>

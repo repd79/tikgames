@@ -163,14 +163,14 @@ create(c){
       if(done>0){done-=dt;if(done<=0){done=0;gen()}}}
     flash=Math.max(0,flash-dt);
     c.rect(0,0,W,c.H,'#26190f');g.fillStyle='#2f2014';for(let y=0;y<c.H;y+=16)for(let x=((y/16)%2)*16;x<W;x+=32)g.fillRect(x,y,16,16);
-    c.txt('⏱ '+Math.ceil(time)+'s',W/2,c.T+10,14,time<20?'#ff6b6b':'#ffb347','center');
+    {const tc=time<20?'#ff6b6b':'#ffb347';c.icon('_timer',W/2-34,c.T+10,16,tc,2.4);c.txt(Math.ceil(time)+'s',W/2+10,c.T+10,14,tc,'center')}
     const px=cs/8;
     for(let y=0;y<NY;y++)for(let x=0;x<NX;x++){const X=ox+x*cs,Y=oy+y*cs,k=key(x,y);
       if(wall[k]){c.rect(X,Y,cs,cs,'#7a4a2a');c.rect(X,Y,cs,3,'#a8693d');c.rect(X,Y+cs-3,cs,3,'#4a2a14');g.fillStyle='#4a2a14';g.fillRect(X+cs/2,Y,2,cs/2);g.fillRect(X,Y+cs/2,cs,2)}
       else{c.rect(X,Y,cs,cs,(x+y)%2?'#5a4330':'#523c2b');if(goal[k]){c.circle(X+cs/2,Y+cs/2,cs*.14,'#ffb347');c.circle(X+cs/2,Y+cs/2,cs*.07,'#3a2a1e')}}
       if(box[k]){ST.spr(g,BX,X+2,Y+2,(cs-4)/8,{B:goal[k]?'#1f7a3a':'#7a4a12',d:goal[k]?'#58d36e':'#d9953a'})}}
     ST.spr(g,PL,ox+P.x*cs+cs*.1,oy+P.y*cs+cs*.05,cs*.8/6,{G:'#58d36e',S:'#fcbcb0',K:'#000',B:'#3a6fd8'});
-    for(let i=0;i<2;i++){const b=btn(i);c.rect(b.x,b.y,b.w,b.h,'#7a4a2a',6);c.txt(i===0?'↶ DESHACER':'⟲ REINICIAR',b.x+b.w/2,b.y+b.h/2+1,10,'#ffe0b0','center')}
+    for(let i=0;i<2;i++){const b=btn(i);c.rect(b.x,b.y,b.w,b.h,'#7a4a2a',6);c.icon(i===0?'_undo':'_retry',b.x+b.w/2-52,b.y+b.h/2,16,'#ffe0b0',2.4);c.txt(i===0?'DESHACER':'REINICIAR',b.x+b.w/2+10,b.y+b.h/2+1,10,'#ffe0b0','center')}
     if(flash>0){g.globalAlpha=flash;g.fillStyle='#fff';g.fillRect(0,0,W,c.H);g.globalAlpha=1}
   });
 }});
@@ -206,7 +206,7 @@ create(c){
       if(done>0){done-=dt;if(done<=0){done=0;gen()}}}
     flash=Math.max(0,flash-dt);
     c.bgGrad('#fff1e6','#ffd9c0');
-    c.txt('⏱ '+Math.ceil(time)+'s',W/2,c.T+8,14,time<20?'#d62828':'#5a3a2a','center');
+    {const tc=time<20?'#d62828':'#5a3a2a';c.icon('_timer',W/2-34,c.T+8,16,tc,2.4);c.txt(Math.ceil(time)+'s',W/2+10,c.T+8,14,tc,'center')}
     const cc=Math.ceil(n/2);
     c.rect(gx-cc*kk-4,gy-cc*kk-4,n*cs+cc*kk+8,n*cs+cc*kk+8,'#fff',8);
     for(let y=0;y<n;y++){const ok=rowOk(y);rowC[y].slice().reverse().forEach((v,i)=>c.txt(String(v),gx-6-i*kk-kk/2,gy+y*cs+cs/2,Math.floor(cs*.42),ok?'#b8a090':'#3a2418','center'))}

@@ -33,6 +33,25 @@ function roundRect(ctx,x,y,w,h,r){r=Math.max(0,Math.min(r,w/2,h/2));ctx.moveTo(x
 
 function safe(){const p=$('#probe'),s=getComputedStyle(p);return{t:parseFloat(s.paddingTop)||0,b:parseFloat(s.paddingBottom)||0}}
 
+// Emojis de los juegos: se dibujan con ilustraciones SVG propias (js/tw, Twemoji) para que se vean igual en todos los móviles
+const TWC={};
+function twImg(e){const cp=Array.from(e).map(ch=>ch.codePointAt(0).toString(16)).filter(h=>h!=='fe0f').join('-');let im=TWC[cp];
+  if(im===undefined){if(!TWSET[cp]){TWC[cp]=null;return null}im=TWC[cp]=new Image();im.onload=()=>{im._ok=1};im.onerror=()=>{im._bad=1};im.src='js/tw/'+cp+'.svg'}return im}
+const TWSET={};["1f300", "1f33f", "1f358", "1f359", "1f35e", "1f361", "1f363", "1f364", "1f365", "1f369", "1f36a", "1f36b", "1f36c", "1f36e", "1f370", "1f371", "1f404", "1f40a", "1f40d", "1f411", "1f413", "1f418", "1f419", "1f41d", "1f41f", "1f420", "1f422", "1f423", "1f427", "1f42c", "1f432", "1f438", "1f439", "1f43b", "1f43e", "1f43f", "1f446", "1f4a3", "1f4a8", "1f525", "1f528", "1f635", "1f642", "1f950", "1f95f", "1f967", "1f96e", "1f96f", "1f976", "1f981", "1f985", "1f986", "1f987", "1f989", "1f98b", "1f98e", "1f995", "1f996", "1f99c", "1f9c1", "26d1", "2728", "2b50"].forEach(k=>{TWSET[k]=1});
+Object.keys(TWSET).forEach(k=>twImg(String.fromCodePoint.apply(null,k.split('-').map(h=>parseInt(h,16)))));
+// Iconos Lucide dibujables en el canvas (c.icon)
+const ICONC={};
+function iconParts(k){let a=ICONC[k];if(a)return a;a=ICONC[k]=[];
+  const d=new DOMParser().parseFromString('<svg xmlns="http://www.w3.org/2000/svg">'+(window.TGI_PATHS[k]||'')+'</svg>','image/svg+xml').documentElement;
+  d.childNodes.forEach(n=>{if(n.nodeType!==1)return;const t=n.tagName,q=x=>parseFloat(n.getAttribute(x))||0;let p=new Path2D();
+    if(t==='path')p=new Path2D(n.getAttribute('d'));
+    else if(t==='circle')p.arc(q('cx'),q('cy'),q('r'),0,6.2832);
+    else if(t==='rect'){if(p.roundRect)p.roundRect(q('x'),q('y'),q('width'),q('height'),q('rx'));else p.rect(q('x'),q('y'),q('width'),q('height'))}
+    else if(t==='line'){p.moveTo(q('x1'),q('y1'));p.lineTo(q('x2'),q('y2'))}
+    else if(t==='ellipse')p.ellipse(q('cx'),q('cy'),q('rx'),q('ry'),0,0,6.2832);
+    else if(t==='polyline'||t==='polygon'){const pt=(n.getAttribute('points')||'').trim().split(/[\s,]+/).map(Number);for(let i=0;i<pt.length;i+=2){i?p.lineTo(pt[i],pt[i+1]):p.moveTo(pt[i],pt[i+1])}if(t==='polygon')p.closePath()}
+    a.push(p)});
+  return a}
 // ---------- Ejecución de un juego ----------
 function mountEmbed(card){
   const g=card._g,stage=$('.stage',card),s=safe();
@@ -78,8 +97,9 @@ function mount(card){
   c.rect=(x,y,w,h,col,r)=>{g2.fillStyle=col;if(r){g2.beginPath();roundRect(g2,x,y,w,h,r);g2.fill()}else g2.fillRect(x,y,w,h)};
   c.circle=(x,y,r,col)=>{g2.fillStyle=col;g2.beginPath();g2.arc(x,y,Math.max(0,r),0,6.2832);g2.fill()};
   c.f=s=>s+'px '+g.font;
-  c.txt=(s,x,y,size,col,al,stroke)=>{g2.font=c.f(size);g2.textAlign=al||'center';g2.textBaseline='middle';if(stroke){g2.lineWidth=Math.max(2,size/7);g2.strokeStyle=stroke;g2.lineJoin='round';g2.strokeText(s,x,y)}g2.fillStyle=col||'#fff';g2.fillText(s,x,y)};
-  c.emoji=(s,x,y,size,rot)=>{g2.save();g2.translate(x,y);if(rot)g2.rotate(rot);g2.font=size+'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';g2.textAlign='center';g2.textBaseline='middle';g2.fillStyle='#000';g2.fillText(s,0,0);g2.restore()};
+  c.txt=(s,x,y,size,col,al,stroke)=>{if(s==='♥'||s==='♡'){c.icon('_heart',x,y,size*1.05,col||'#fff',2.2,s==='♥');return}if(typeof s==='string'&&s.length<=3&&s.length>0){const cp0=s.codePointAt(0);if((cp0>=0x1F000||cp0===0x2B50||cp0===0x2728||cp0===0x26D1)&&TWSET[Array.from(s).map(ch=>ch.codePointAt(0).toString(16)).filter(h=>h!=='fe0f').join('-')]){c.emoji(s,x,y,size);return}}g2.font=c.f(size);g2.textAlign=al||'center';g2.textBaseline='middle';if(stroke){g2.lineWidth=Math.max(2,size/7);g2.strokeStyle=stroke;g2.lineJoin='round';g2.strokeText(s,x,y)}g2.fillStyle=col||'#fff';g2.fillText(s,x,y)};
+  c.icon=(k,x,y,size,col,lw,fill)=>{const ps=iconParts(k);g2.save();g2.translate(x-size/2,y-size/2);g2.scale(size/24,size/24);g2.strokeStyle=col;g2.fillStyle=col;g2.lineWidth=lw||2;g2.lineCap='round';g2.lineJoin='round';ps.forEach(p=>{if(fill)g2.fill(p);g2.stroke(p)});g2.restore()};
+  c.emoji=(s,x,y,size,rot)=>{const im=twImg(s);if(im&&im._ok){g2.save();g2.translate(x,y);if(rot)g2.rotate(rot);const z=size*1.08;g2.drawImage(im,-z/2,-z/2,z,z);g2.restore()}else if(!im||im._bad){g2.save();g2.translate(x,y);if(rot)g2.rotate(rot);g2.font=size+'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';g2.textAlign='center';g2.textBaseline='middle';g2.fillStyle='#000';g2.fillText(s,0,0);g2.restore()}};
   c.bgGrad=(a,b,mid)=>{const gr=g2.createLinearGradient(0,0,0,c.H);gr.addColorStop(0,a);if(mid)gr.addColorStop(.5,mid);gr.addColorStop(1,b);g2.fillStyle=gr;g2.fillRect(0,0,c.W,c.H)};
   c.glow=(col,b)=>{g2.shadowColor=col;g2.shadowBlur=b};
   c.noglow=()=>{g2.shadowBlur=0};
@@ -92,7 +112,7 @@ function mount(card){
     c.after(520,()=>{
       $('.ot',overEl).textContent=title||'GAME OVER';
       $('.os',overEl).textContent=c.sc;
-      $('.ob',overEl).textContent=nb?'🏆 ¡NUEVO RÉCORD!':('Récord: '+c.best)+(sub?' · '+sub:'');
+      $('.ob',overEl).innerHTML=nb?TGI('_trophy',16,2.4)+' ¡NUEVO RÉCORD!':('Récord: '+c.best)+(sub?' · '+String(sub).replace(/</g,'&lt;'):'');
       overEl.classList.add('show');overReady=performance.now()+450;
       let n=3;const nx=$('.nx',overEl);nx.textContent='siguiente juego en '+n+'…';
       const tick=()=>{n--;if(n<=0){nx.textContent='';window.TG.next();return}nx.textContent='siguiente juego en '+n+'…';c.after(1000,tick)};
@@ -140,7 +160,7 @@ function mount(card){
 
   // arranque
   hudScore.textContent='0';
-  $('span',hintEl).textContent=g.hint||'';
+  {const raw=g.hint||'',hand=/^[\u{1F446}-\u{1F449}]\uFE0F?\s*/u.test(raw),txt=raw.replace(/^[\u{1F446}-\u{1F449}]\uFE0F?\s*/u,'').replace(/\u{1F440}/gu,'').replace(/</g,'&lt;');$('span',hintEl).innerHTML=(hand?TGI('_pointer',16,2.2)+' ':'')+txt}
   timers.push(setTimeout(()=>{if(!inputSeen)hintEl.classList.add('on')},500));
   timers.push(setTimeout(()=>hintEl.classList.remove('on'),6500));
   start();
@@ -161,11 +181,11 @@ function mount(card){
 function makeCard(g){
   const el=document.createElement('section');el.className='card '+(g.embed?'embed ':'')+g.skin.split(' ').map(k=>'sk-'+k).join(' ');el._g=g;
   el.style.setProperty('--c1',g.colors[0]);el.style.setProperty('--c2',g.colors[1]);el.style.setProperty('--ac',g.colors[2]);el.style.setProperty('--font',g.font);
-  el.innerHTML='<div class="poster"><div class="pe">'+g.emoji+'</div><div class="pt">'+g.title+'</div><div class="ps">toca para jugar</div></div>'+
+  el.innerHTML='<div class="poster"><div class="pe">'+TGI(g.id,112,1.4)+'</div><div class="pt">'+g.title+'</div><div class="ps">toca para jugar</div></div>'+
     '<div class="stage"></div><div class="hud"><div class="score"></div><div class="hint"><span></span></div><div class="toast"></div></div>'+
     '<div class="intro">'+g.title+'</div>'+
-    '<div class="over"><div class="ot"></div><div class="os"></div><div class="ob"></div><div class="or">TOCA PARA REINTENTAR</div><div class="nx"></div></div>'+
-    '<div class="meta"><div><b>'+g.emoji+' '+g.title+'</b><span>#'+g.tag+'</span></div><button class="heart" aria-label="favorito">♥</button></div>'+(g.embed?'<button class="skipb" aria-label="siguiente juego">siguiente ⏭</button>':'');
+    '<div class="over"><div class="ot"></div><div class="os"></div><div class="ob"></div><div class="or">'+TGI('_retry',18,2.8)+'<span>REINTENTAR</span></div><div class="nx"></div></div>'+
+    '<div class="meta"><div><b><i class="mi">'+TGI(g.id,18,2.2)+'</i>'+g.title+'</b><span>#'+g.tag+'</span></div><button class="heart" aria-label="favorito">'+TGI('_heart',26,2.2)+'</button></div>'+(g.embed?'<button class="skipb" aria-label="siguiente juego">siguiente '+TGI('_skip',15,2.4)+'</button>':'');
   if(g.embed){const sb=$('.skipb',el);sb.addEventListener('pointerdown',e=>e.stopPropagation());sb.addEventListener('click',e=>{e.stopPropagation();window.TG.next()})}
   const hb=$('.heart',el);hb.classList.toggle('on',favs.indexOf(g.id)>=0);
   hb.addEventListener('pointerdown',e=>e.stopPropagation());
@@ -175,13 +195,13 @@ function makeCard(g){
 }
 function endCard(){
   const el=document.createElement('section');el.className='card';el.style.setProperty('--c1','#111');el.style.setProperty('--c2','#2b1055');
-  el.innerHTML='<div class="endcard"><div style="font-size:70px">✨</div><h2>¡Eso es todo por ahora!</h2><p style="opacity:.7">Pronto habrá más juegos.</p><button>↑ Volver al inicio</button></div>';
+  el.innerHTML='<div class="endcard"><div class="eic">'+TGI('_sparkles',72,1.4)+'</div><h2>¡Eso es todo por ahora!</h2><p style="opacity:.7">Pronto habrá más juegos.</p><button>'+TGI('_arrow',16,2.6)+' Volver al inicio</button></div>';
   $('button',el).onclick=()=>feed.scrollTo({top:0,behavior:'smooth'});
   return el;
 }
 function emptyCard(){
   const el=document.createElement('section');el.className='card';el.style.setProperty('--c1','#111');el.style.setProperty('--c2','#3a0a2b');
-  el.innerHTML='<div class="endcard"><div style="font-size:70px">♥</div><h2>Aún no tienes favoritos</h2><p style="opacity:.7">Dale al corazón de los juegos que te gusten.</p><button>Ir a "Para ti"</button></div>';
+  el.innerHTML='<div class="endcard"><div class="eic">'+TGI('_heart',72,1.4)+'</div><h2>Aún no tienes favoritos</h2><p style="opacity:.7">Dale al corazón de los juegos que te gusten.</p><button>'+TGI('_sparkles',16,2.4)+' Ir a Para ti</button></div>';
   $('button',el).onclick=()=>setMode('all');
   return el;
 }
@@ -193,10 +213,10 @@ function toggleFav(id,btn){
   cards.forEach(cd=>{if(cd._g&&cd._g.id===id&&cd!==btn.closest('.card'))$('.heart',cd).classList.toggle('on',on)});
   updateTabs();
   if(on){
-    for(let k=0;k<6;k++){const h=document.createElement('div');h.className='fh';h.textContent='♥';h.style.right=(24+Math.random()*30)+'px';h.style.bottom='46px';h.style.setProperty('--dx',((Math.random()-.5)*80)+'px');h.style.animationDelay=(k*.04)+'s';btn.closest('.card').appendChild(h);setTimeout(()=>h.remove(),1100)}
+    for(let k=0;k<6;k++){const h=document.createElement('div');h.className='fh';h.innerHTML=TGI('_heart',26,2).replace('fill="none"','fill="currentColor"');h.style.right=(24+Math.random()*30)+'px';h.style.bottom='46px';h.style.setProperty('--dx',((Math.random()-.5)*80)+'px');h.style.animationDelay=(k*.04)+'s';btn.closest('.card').appendChild(h);setTimeout(()=>h.remove(),1100)}
   }
 }
-function updateTabs(){$('#tab-favs').textContent='Favoritos ♥'+(favs.length?' '+favs.length:'')}
+function updateTabs(){$('#tab-favs').innerHTML=TGI('_heart',15,2.4)+'<span>Favoritos'+(favs.length?' <i class="cn">'+favs.length+'</i>':'')+'</span>';$('#tab-all').innerHTML=TGI('_sparkles',15,2.4)+'<span>Para ti</span>'}
 
 function build(){
   feed.innerHTML='';cards=[];
@@ -251,9 +271,9 @@ updateTabs();build();
 $('#tab-all').onclick=()=>setMode('all');
 $('#tab-favs').onclick=()=>setMode('favs');
 const muteBtn=$('#mute');
-window.Aud.on=!store.get('mute',false);muteBtn.textContent=window.Aud.on?'🔊':'🔇';
+window.Aud.on=!store.get('mute',false);const paintMute=()=>{muteBtn.innerHTML=TGI(window.Aud.on?'_vol':'_mute',22,2.2)};paintMute();
 window.Aud.init();
-muteBtn.onclick=()=>{window.Aud.setOn(!window.Aud.on);store.set('mute',!window.Aud.on);muteBtn.textContent=window.Aud.on?'🔊':'🔇'};
+muteBtn.onclick=()=>{window.Aud.setOn(!window.Aud.on);store.set('mute',!window.Aud.on);paintMute()};
 // El navegador no deja sonar hasta el primer toque: en cuanto llega, se activa el audio
 ['pointerdown','pointerup','touchend','keydown','click'].forEach(ev=>document.addEventListener(ev,()=>window.Aud.resume(),{passive:true,capture:true}));
 document.addEventListener('visibilitychange',()=>{if(document.hidden)window.Aud.pause();else window.Aud.resume()});
